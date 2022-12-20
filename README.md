@@ -6,6 +6,8 @@ Bring back PUC Rio lua functionality into luau. Mostly used for BYOGE.
     - [ ] Optional "Sandbox" require with PhysFS
 - [X] IO System access
     - [ ] Optional "Sandbox" io access with PhysFS
+- [ ] LSP support for libs
+    - [ ] iolib.d.luau
 
 Dependencies:
 
