@@ -41,8 +41,13 @@
 #define LUAL_BUFFERSIZE		BUFSIZ
 #define LUA_IOLIBNAME	"io"
 
-#define lua_popen(L,c,m)	((void)L, _popen(c,m))
-#define lua_pclose(L,file)	((void)L, (_pclose(file) != -1))
+#ifdef __WIN32
+#define popen _popen
+#define pclose _pclose
+#else
+#define lua_popen(L,c,m)	((void)L, popen(c,m))
+#define lua_pclose(L,file)	((void)L, (pclose(file) != -1))
+#endif
 
 #define IO_INPUT	1
 #define IO_OUTPUT	2
