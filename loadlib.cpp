@@ -119,6 +119,12 @@
 // END luaconf.h 5.1.5
 
 // START lauxlib.h
+#ifdef LUAU_DEBUG
+#include "debugger.h"
+#else
+int debugLevel = 0;
+#define debugger_register(L,filename)
+#endif
 
 const char* luaL_gsub(lua_State* L, const char* s, const char* p,
     const char* r) {
@@ -127,7 +133,7 @@ const char* luaL_gsub(lua_State* L, const char* s, const char* p,
     luaL_Buffer b;
     luaL_buffinit(L, &b);
     while ((wild = strstr(s, p)) != NULL) {
-        luaL_addlstring(&b, s, wild - s);  /* push prefix */
+        luaL_addlstring(&b, s, wild - s,0);  /* push prefix */
         luaL_addstring(&b, r);  /* push replacement in place of pattern */
         s = wild + l;  /* continue after 'p' */
     }
@@ -148,10 +154,14 @@ int luaL_loadfile(lua_State* L, const char* filename) {
     }
     size_t bytecodeSize = 0;
     size_t len = strlen(contents);
-    char* bytecode = luau_compile(contents, len, NULL, &bytecodeSize);
+    lua_CompileOptions opts;
+    opts.debugLevel = debugLevel;
+    char* bytecode = luau_compile(contents, len, &opts, &bytecodeSize);
     int result = luau_load(L, filename, bytecode, bytecodeSize, 0);
     free(bytecode);
     fclose(f);
+
+    debugger_register(L,filename);
 
     return result;
 }
@@ -286,12 +296,12 @@ static int ll_require (lua_State *L) {
   lua_call(L, 1, 1);  /* run loaded module */
   if (!lua_isnil(L, -1))  /* non-nil return? */
     lua_setfield(L, 2, name);  /* _LOADED[name] = returned value */
-  lua_getfield(L, 2, name);
   if (lua_touserdata(L, -1) == sentinel) {   /* module did not set a value? */
     lua_pushboolean(L, 1);  /* use true as result */
     lua_pushvalue(L, -1);  /* extra copy to be returned */
     lua_setfield(L, 2, name);  /* _LOADED[name] = true */
   }
+  
   return 1;
 }
 

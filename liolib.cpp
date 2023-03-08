@@ -331,15 +331,15 @@ static int read_line (lua_State *L, FILE *f) {
     char p[LUAL_BUFFERSIZE] = { 0 };
     if (fgets(p, LUAL_BUFFERSIZE, f) == NULL) {  /* eof? */
         l = strlen(p);
-        luaL_addlstring(&b,p,l);
+        luaL_addlstring(&b,p,l,0);
         luaL_pushresult(&b);  /* close buffer */
         return l > 0;  /* check whether read something */
     }
     l = strlen(p);
     if (l == 0 || p[l - 1] != '\n')
-        luaL_addlstring(&b, p, l);
+        luaL_addlstring(&b, p, l,0);
     else {
-      luaL_addlstring(&b, p, l - 1);  /* do not include `eol' */
+      luaL_addlstring(&b, p, l - 1,0);  /* do not include `eol' */
       luaL_pushresult(&b);  /* close buffer */
       return 1;  /* read at least an `eol' */
     }
@@ -357,7 +357,7 @@ static int read_chars (lua_State *L, FILE *f, size_t n) {
     char p[LUAL_BUFFERSIZE] = {0};
     if (rlen > n) rlen = n;  /* cannot read more than asked */
     nr = fread(p, sizeof(char), rlen, f);
-    luaL_addlstring(&b, p, nr);
+    luaL_addlstring(&b, p, nr,0);
     n -= nr;  /* still have to read `n' chars */
   } while (n > 0 && nr == rlen);  /* until end of count or eof */
   luaL_pushresult(&b);  /* close buffer */
