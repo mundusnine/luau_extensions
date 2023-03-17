@@ -178,7 +178,7 @@ void luaL_setfuncs(lua_State* L, const luaL_Reg* l, int nup) {
     lua_pop(L, nup);  /* remove upvalues */
 }
 
-void luaL_newlib(lua_State* L,luaL_Reg* l){
+void luaL_newlib(lua_State* L,const luaL_Reg* l){
   lua_createtable(L, 0, sizeof(l)/sizeof((l)[0]) - 1);
   luaL_setfuncs(L,l,0); 
 }
