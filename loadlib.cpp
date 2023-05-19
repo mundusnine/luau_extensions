@@ -249,14 +249,27 @@ static int loader_Lua (lua_State *L) {
   return 1;  /* library loaded successfully */
 }
 
+static void print_table_fields(lua_State* L, int index) {
+  int n = lua_objlen(L,index);
+  for(int i =1; i <= n;++i){
+    lua_rawgeti(L,-1,i);
+    const char* key = lua_tostring(L, -1);  // get the key as a string
+    printf("Field name: %s\n", key);
+    lua_pop(L, 1);  // pop the value, but leave the key on the stack
+  }
+}
+
 static int loader_preload (lua_State *L) {
   const char *name = luaL_checkstring(L, 1);
   lua_getfield(L, LUA_ENVIRONINDEX, "preload");
+  print_table_fields(L,-1);
   if (!lua_istable(L, -1))
     luaL_error(L, "package.preload must be a table");
   lua_getfield(L, -1, name);
-  if (lua_isnil(L, -1))  /* not found? */
+  if (lua_isnil(L, -1)){  /* not found? */
+    print_table_fields(L,-2);
     lua_pushfstring(L, "\n\tno field package.preload['%s']", name);
+  }
   return 1;
 }
 

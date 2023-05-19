@@ -2,9 +2,13 @@
 
 #define LUAU_VERSION_NUM 0566
 
+#ifndef LUAUC_PLUGIN_IMPL
 #include "lua.h"
 #include "lualib.h"
 #include "luaconf.h"
+#else
+#include "luauc_plugin_api.h"
+#endif
 
 #define LUA_IOLIBNAME	"io"
 LUALIB_API int luaopen_io(lua_State* L);
