@@ -280,6 +280,7 @@ static const int sentinel_ = 0;
 
 static int ll_require (lua_State *L) {
   const char *name = luaL_checkstring(L, 1);
+  #ifndef LUAU_BACKEND
   int i;
   //lua_settop(L, 1);  /* _LOADED table will be at index 2 */
   lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
@@ -319,6 +320,16 @@ static int ll_require (lua_State *L) {
     lua_pushvalue(L, -1);  /* extra copy to be returned */
     lua_setfield(L, 2, name);  /* _LOADED[name] = true */
   }
+  #else
+  char temp[256] = {0};
+  snprintf(temp,256,"CACHED_%s",name);
+  lua_getglobal(L,temp);
+  if(lua_isnoneornil(L,-1)){
+    lua_newtable(L);
+    lua_setglobal(L,temp);
+    lua_getglobal(L,temp);
+  }
+  #endif
   
   return 1;
 }
